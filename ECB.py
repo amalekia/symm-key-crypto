@@ -15,7 +15,6 @@ def decrypt(key, data):
     for i in range(0, len(data), 16):
         block = data[i:i+16]
         data = data[:i] + cipher.decrypt(block) + data[i+16:]
-        
     return cipher.decrypt(data)
 
 def generate_key():
