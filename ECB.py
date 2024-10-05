@@ -2,8 +2,8 @@ from Crypto.Cipher import AES
 import random
 
 def encrypt(key, data):
-    header = data[:54]                                              # The first 54 bytes of the data are the header
-    data = data[54:]
+    header = data[:138]                                              # The first 54 bytes of the data are the header
+    data = data[138:]
     cipher = AES.new(key, AES.MODE_ECB)
     for i in range(0, len(data), 16):                               # Goes through 16 bytes of data at a time
         block = data[i:i+16]
@@ -13,8 +13,8 @@ def encrypt(key, data):
     return header + cipher.encrypt(data)
 
 def decrypt(key, data):
-    header = data[:54]
-    data = data[54:]
+    header = data[:138]
+    data = data[138:]
     cipher = AES.new(key, AES.MODE_ECB)
     for i in range(0, len(data), 16):
         block = data[i:i+16]
