@@ -19,7 +19,9 @@ def decrypt(key, data):
     for i in range(0, len(data), 16):
         block = data[i:i+16]
         data = data[:i] + cipher.decrypt(block) + data[i+16:]
-    return header + cipher.decrypt(data)
+    data = header + cipher.decrypt(data)
+    padding_len = data[-1]
+    return data[:-padding_len]
 
 def generate_key():
     return bytes([random.randint(0, 255) for _ in range(16)])
