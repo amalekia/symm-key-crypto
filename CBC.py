@@ -7,6 +7,10 @@ def generate_IV():
 def generate_key():
     return bytes([random.randint(0, 255) for _ in range(16)])
 
+def submit(string):
+    string.insert(0, "userid=456; userdata=")
+    string.append(";session-id=31337")
+
 def encrypt(key, iv, data):
     cipher = AES.new(key, AES.MODE_CBC, iv=iv)
     for i in range(0, len(data), 16):
