@@ -58,18 +58,18 @@ def decrypt_data(key, data, header_size=54):
     return bmp_header + plaintext
 
 if __name__ == '__main__':
-    with open('./plaintext.bmp', 'rb') as f:
+    with open('./plaintext.txt', 'rb') as f:
         plaintext = f.read()
 
-    key = generate_key()  
-    iv = generate_iv()   
+    key = generate_key()                                            # This key myst be 16 bytes long
+    ciphertext = encrypt_data(key, generate_iv(), plaintext)
 
-    # Encrypt and save with CBC mode
-    ciphertext_cbc = encrypt_data(key, iv, plaintext)
-    with open('./ciphertext_cbc.bmp', 'wb') as f:
-        f.write(ciphertext_cbc)
+    with open('./ciphertext.txt', 'wb') as f:
+        f.write(ciphertext)
 
-    # Decrypt and save with CBC mode
-    decrypted_cbc = decrypt_data(key, ciphertext_cbc)
-    with open('./decrypted_cbc.bmp', 'wb') as f:
-        f.write(decrypted_cbc)
+    with open('./ciphertext.txt', 'rb') as f:
+        ciphertext = f.read()
+    
+    with open('./decrypted.txt', 'wb') as f:
+        decrypted = decrypt_data(key, ciphertext)
+        f.write(decrypted)
