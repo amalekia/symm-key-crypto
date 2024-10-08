@@ -2,10 +2,10 @@ from Crypto.Cipher import AES
 import random
 
 def encrypt(key, data):
-    header = data[:138]                                              # The first 138 bytes of the data are the header
+    header = data[:138]                                             # The first 138 bytes of the data are the header
     data = data[138:]
     padding_len = 16 - (len(data) % 16)
-    data += bytes([padding_len] * padding_len)                                          # Pad the data before encryption
+    data += bytes([padding_len] * padding_len)                      # Pad the data before encryption
     
     cipher = AES.new(key, AES.MODE_ECB)
     encrypted_data = b''
@@ -23,7 +23,7 @@ def decrypt(key, data):
         block = data[i:i+16]
         decrypted_data += cipher.decrypt(block)
     padding_len = data[-1]
-    decrypted_data[:-padding_len]                          # Unpad the data after decryption
+    decrypted_data[:-padding_len]                                   # Unpad the data after decryption
     return header + decrypted_data
 
 def generate_key():
