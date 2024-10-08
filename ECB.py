@@ -1,4 +1,5 @@
 from Crypto.Cipher import AES
+import urllib.parse
 import random
 
 def encrypt(key, data):

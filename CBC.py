@@ -1,5 +1,6 @@
 from Crypto.Cipher import AES
 import os
+import urllib.parse
 
 def generate_key():
     return os.urandom(16)
@@ -8,8 +9,19 @@ def generate_iv():
     return os.urandom(16)
 
 def submit(string):
-    string.insert(0, "userid=456; userdata=")
-    string.append(";session-id=31337")
+    # URL encode the string using quote function in urllib.parse
+    string = "userid=456;userdata=" + urllib.parse.quote(string) + ";session-id=31337" 
+    # Padding the string using PKCS#7
+    block_size = 16
+    padding_length = block_size - (len(string) % block_size)
+    padded_string = string + chr(padding_length) * padding_length
+    return padded_string
+
+def verify(string):
+    # Unpadding the string using PKCS#7
+    padding_length = string[-1]
+    return string[:-padding_length]
+
 
 def encrypt_data(key, iv, data, header_size=54):
     # we might want to change header_size to 138 depending
@@ -62,11 +74,14 @@ def decrypt_data(key, data, header_size=54):
     return bmp_header + plaintext
 
 if __name__ == '__main__':
+    # part 1
     with open('./plaintext.txt', 'rb') as f:
         plaintext = f.read()
 
     key = generate_key()                                            # This key myst be 16 bytes long
-    ciphertext = encrypt_data(key, generate_iv(), plaintext)
+    iv = generate_iv()
+
+    ciphertext = encrypt_data(key, iv, plaintext)
 
     with open('./ciphertext.txt', 'wb') as f:
         f.write(ciphertext)
@@ -77,3 +92,11 @@ if __name__ == '__main__':
     with open('./decrypted.txt', 'wb') as f:
         decrypted = decrypt_data(key, ciphertext)
         f.write(decrypted)
+    
+    # part 2
+    with open('./plaintextP2.txt', 'rb') as f:
+        plaintextP2 = f.read()
+        print(f'Original plaintext: {plaintextP2}')
+        ciphertext = submit(plaintextP2)
+        print(f'Generated ciphertext: {ciphertext}')
+        # print(f'Verifying if admin=true: {verify(ciphertext)})')
