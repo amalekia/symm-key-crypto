@@ -75,7 +75,7 @@ def decrypt_data(key, data, header_size=54):
 
 if __name__ == '__main__':
     # part 1
-    with open('./plaintext.txt', 'rb') as f:
+    with open('./cp-logo.bmp', 'rb') as f:
         plaintext = f.read()
 
     key = generate_key()                                            # This key myst be 16 bytes long
@@ -83,13 +83,13 @@ if __name__ == '__main__':
 
     ciphertext = encrypt_data(key, iv, plaintext)
 
-    with open('./ciphertext.txt', 'wb') as f:
+    with open('./ciphertext.bmp', 'wb') as f:
         f.write(ciphertext)
 
-    with open('./ciphertext.txt', 'rb') as f:
+    with open('./ciphertext.bmp', 'rb') as f:
         ciphertext = f.read()
     
-    with open('./decrypted.txt', 'wb') as f:
+    with open('./decrypted.bmp', 'wb') as f:
         decrypted = decrypt_data(key, ciphertext)
         f.write(decrypted)
     
