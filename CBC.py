@@ -90,39 +90,21 @@ def get_ciphertext_length(ciphertext):
     return len(ciphertext)
 
 def flipping_bit_attack(ciphertext):
-    res = None
-    ciphertext_length = get_ciphertext_length(ciphertext)
-
-    # find admin= in global_bytes_string after decoding it first
-    adminIndex = global_bytes_string.find(b'admin%3D')
-
-    #convert bytestring to regular string
-    regular_string = global_bytes_string.decode()
-    # ciphertext length should be matching 
-    if ciphertext_length > adminIndex:
-        print("dsd" , regular_string[adminIndex])
-        i = adminIndex + 8
-        if regular_string[i] == 't':
-            res = global_bytes_string
-            print("already true ", res)
-        elif regular_string[i] == 'f':
-            # We need to flip the bit to change 'f' to 't'
-            # XOR the byte at index i with the difference
-            f_ascii = ord('f')  
-            t_ascii = ord('t')  
-            difference = t_ascii - f_ascii  
-
-            # Convert the ciphertext to a mutable bytearray
-            modified_ciphertext = bytearray(ciphertext)
-
-            # XOR the byte at position `adminIndex + 8` to change 'f' to 't'
-            modified_ciphertext[adminIndex + 8] ^= difference
-
-            # Return the modified ciphertext as a bytes string
-            res = (bytes(modified_ciphertext))
-            print("already false now is true ", res)
-        
-    return res
+    # Find the index of 'admin%3D' in the global_bytes_string
+    admin_index = global_bytes_string.find(b'admin%3D')
+    if admin_index == -1:
+        return ciphertext
+    
+    # Calculate the position in the ciphertext where we need to flip the bit
+    block_size = 16
+    block_index = admin_index // block_size
+    byte_index_in_block = admin_index % block_size
+    # Convert the ciphertext to a mutable bytearray
+    modified_ciphertext = bytearray(ciphertext)
+    # Flip the bit in the previous block to affect the current block's plaintext
+    # We need to flip the bit in the byte before the 'admin%3D' string in the ciphertext
+    modified_ciphertext[block_index * block_size + byte_index_in_block - block_size] ^= 1
+    return bytes(modified_ciphertext)
 
 
 def submit(string):
@@ -135,11 +117,9 @@ def submit(string):
     bytes_string = bytes(padded_string, 'utf-8')
     global global_bytes_string
     global_bytes_string = bytes_string
-    print("length of string in submit aftert padding is " , len(bytes_string))
     return encrypt_data_P2(key, iv, bytes_string)
 
 def verify(param):
-    print("verify string is " , param)
     # Unpadding the string using PKCS#7
     padding_length = param[-1]
     param[:-padding_length]
@@ -147,7 +127,7 @@ def verify(param):
     # Decrypt the string
     decrypted = decrypt_data_P2(key, param)
     print(f'Decrypted: {decrypted}')
-    decrypted_str = decrypted.decode()
+    decrypted_str = decrypted.decode(errors='ignore')
 
     # Check if the string contains "admin=true"
     return "admin%3Dtrue" in decrypted_str
