@@ -112,13 +112,10 @@ def flipping_bit_attack(ciphertext):
             t_ascii = ord('t')
             flip_mask = f_ascii ^ t_ascii  # XOR of 'f' and 't' gives the bit flip mask
 
-            # Convert the ciphertext to a mutable bytearray
             modified_ciphertext = bytearray(ciphertext)
 
-            # XOR the byte at position `adminIndex + 8` to flip 'f' to 't'
             modified_ciphertext[adminIndex + 8] ^= flip_mask
 
-            # Return the modified ciphertext as a bytes string
             res = bytes(modified_ciphertext)
             print("\n\nAlready false, now is true\n", res)
 
