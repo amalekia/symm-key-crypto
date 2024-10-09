@@ -171,6 +171,7 @@ if __name__ == '__main__':
     with open('./ciphertext.bmp', 'rb') as f:
         ciphertext = f.read()
         
+        
     
     with open('./decrypted.bmp', 'wb') as f:
         decrypted = decrypt_data(key, ciphertext)
