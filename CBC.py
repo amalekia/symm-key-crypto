@@ -93,34 +93,37 @@ def flipping_bit_attack(ciphertext):
     res = None
     ciphertext_length = get_ciphertext_length(ciphertext)
 
-    # find admin= in global_bytes_string after decoding it first
+    # Find 'admin=' in the global_bytes_string after decoding it
     adminIndex = global_bytes_string.find(b'admin%3D')
 
-    #convert bytestring to regular string
+    # Convert bytestring to regular string
     regular_string = global_bytes_string.decode()
-    # ciphertext length should be matching 
+
+    # Ciphertext length should be matching 
     if ciphertext_length > adminIndex:
-        i = adminIndex + 8
+        i = adminIndex + 8  # Assuming the format 'admin%3D' ends at index adminIndex + 8
+
         if regular_string[i] == 't':
             res = ciphertext
-            print("already true ", res)
+            print("Already true", res)
         elif regular_string[i] == 'f':
-            # We need to flip the bit to change 'f' to 't'
-            # XOR the byte at index i with the difference
-            f_ascii = ord('f')  
-            t_ascii = ord('t')  
-            difference = t_ascii - f_ascii  
+            # XOR the byte at index i to flip 'f' to 't'
+            f_ascii = ord('f')
+            t_ascii = ord('t')
+            flip_mask = f_ascii ^ t_ascii  # XOR of 'f' and 't' gives the bit flip mask
 
             # Convert the ciphertext to a mutable bytearray
             modified_ciphertext = bytearray(ciphertext)
-            # XOR the byte at position `adminIndex + 8` to change 'f' to 't'
-            modified_ciphertext[adminIndex + 8] ^= difference
+
+            # XOR the byte at position `adminIndex + 8` to flip 'f' to 't'
+            modified_ciphertext[adminIndex + 8] ^= flip_mask
 
             # Return the modified ciphertext as a bytes string
-            res = (bytes(modified_ciphertext))
-            print("\n\nalready false now is true \n", res)
-        
+            res = bytes(modified_ciphertext)
+            print("\n\nAlready false, now is true\n", res)
+
     return res
+
 
 
 def submit(string):

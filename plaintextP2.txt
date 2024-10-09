@@ -1,1 +1,1 @@
-Hello, I am in CSC 321.
+Hello, I am in CSC 321. admin=false
