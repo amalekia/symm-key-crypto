@@ -98,11 +98,13 @@ def flipping_bit_attack(ciphertext):
 
     # Convert bytestring to regular string
     regular_string = global_bytes_string.decode()
+    regular_string = regular_string.replace('%3D', '=')
 
+    # Find 'admin=' in the modified string
+    adminIndex = regular_string.find('admin=')
     # Ciphertext length should be matching 
     if ciphertext_length > adminIndex:
-        i = adminIndex + 8  # Assuming the format 'admin%3D' ends at index adminIndex + 8
-
+        i = adminIndex + 6
         if regular_string[i] == 't':
             res = ciphertext
             print("Already true", res)
@@ -148,7 +150,7 @@ def verify(param):
     decrypted_str = str(decrypted, 'utf-8')
 
     # Check if the string contains "admin=true"
-    return "admin%3Dtrue" in decrypted_str
+    return "admin=true" in decrypted_str
 
 def decrypt_data(key, data, header_size=54):
     bmp_header = data[:header_size]
