@@ -86,7 +86,6 @@ def decrypt_data_P2(key, data):
 
 
 def get_ciphertext_length(ciphertext):
-    
     return len(ciphertext)
 
 def flipping_bit_attack(ciphertext):
@@ -110,7 +109,6 @@ def flipping_bit_attack(ciphertext):
         modified_ciphertext[block_index * block_size + byte_index_in_block] ^= global_bytes_string[target_index + i] ^ target_string[i]
     
     return bytes(modified_ciphertext)
-
 
 def submit(string):
     # URL encode the string using quote function in urllib.parse
