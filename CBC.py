@@ -90,26 +90,32 @@ def get_ciphertext_length(ciphertext):
     return len(ciphertext)
 
 def flipping_bit_attack(ciphertext):
-    # Find the index of 'admin%3D' in the global_bytes_string
-    admin_index = global_bytes_string.find(b'admin%3D')
-    if admin_index == -1:
+    # Find the index of 'userdata=' in the global_bytes_string
+    userdata_index = global_bytes_string.find(b'userdata=')
+    if userdata_index == -1:
         return ciphertext
     
-    # Calculate the position in the ciphertext where we need to flip the bit
+    # Calculate the position in the ciphertext where we need to flip the bits
     block_size = 16
-    block_index = admin_index // block_size
-    byte_index_in_block = admin_index % block_size
+    target_string = b';admin=true;'
+    target_index = userdata_index + len('userdata=')
+    
     # Convert the ciphertext to a mutable bytearray
     modified_ciphertext = bytearray(ciphertext)
-    # Flip the bit in the previous block to affect the current block's plaintext
-    # We need to flip the bit in the byte before the 'admin%3D' string in the ciphertext
-    modified_ciphertext[block_index * block_size + byte_index_in_block - block_size] ^= 1
+    
+    for i in range(len(target_string)):
+        block_index = (target_index + i) // block_size
+        byte_index_in_block = (target_index + i) % block_size
+        # Flip the bit in the previous block to affect the current block's plaintext
+        modified_ciphertext[block_index * block_size + byte_index_in_block] ^= global_bytes_string[target_index + i] ^ target_string[i]
+    
     return bytes(modified_ciphertext)
 
 
 def submit(string):
     # URL encode the string using quote function in urllib.parse
     string = "userid=456;userdata=" + urllib.parse.quote(string) + ";session-id=31337" 
+
     # Padding the string using PKCS#7
     block_size = 16
     padding_length = block_size - (len(string) % block_size)
@@ -120,17 +126,15 @@ def submit(string):
     return encrypt_data_P2(key, iv, bytes_string)
 
 def verify(param):
-    # Unpadding the string using PKCS#7
-    padding_length = param[-1]
-    param[:-padding_length]
-
     # Decrypt the string
     decrypted = decrypt_data_P2(key, param)
-    print(f'Decrypted: {decrypted}')
-    decrypted_str = decrypted.decode(errors='ignore')
+    # Decode the URL-encoded string
+    decoded_str = decrypted.decode('utf-8', errors='ignore')
+    print(f'Decrypted: {decoded_str}')
+    decrypted_str = decoded_str
 
     # Check if the string contains "admin=true"
-    return "admin%3Dtrue" in decrypted_str
+    return ";admin=true;" in decrypted_str
 
 def decrypt_data(key, data, header_size=54):
     bmp_header = data[:header_size]
@@ -179,10 +183,8 @@ if __name__ == '__main__':
     # part 2
     with open('./plaintextP2.txt', 'rb') as f:
         plaintextP2 = f.read()
-        ciphertext = submit(plaintextP2)
-        print(type(ciphertext))
+        ciphertext = submit(plaintextP2.decode('utf-8'))
         print(f'Verifying if admin=true: {verify(ciphertext)}\n')
-        # hacked_cipher_text is some bytes string
+
         hacked_cipher_text = flipping_bit_attack(ciphertext)
-        print(type(hacked_cipher_text))
         print(f'Verifying if admin=true after flipping bit: {verify(hacked_cipher_text)}\n')

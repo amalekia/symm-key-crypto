@@ -1,1 +1,1 @@
-Hello, admin=trueI am in CSC 321.
+Hello, ;admin=true; I am in CSC 321.
