@@ -131,10 +131,8 @@ def verify(param):
     # Decode the URL-encoded string
     decoded_str = decrypted.decode('utf-8', errors='ignore')
     print(f'Decrypted: {decoded_str}')
-    decrypted_str = decoded_str
-
     # Check if the string contains "admin=true"
-    return ";admin=true;" in decrypted_str
+    return ";admin=true;" in decoded_str
 
 def decrypt_data(key, data, header_size=54):
     bmp_header = data[:header_size]
@@ -182,9 +180,11 @@ if __name__ == '__main__':
     
     # part 2
     with open('./plaintextP2.txt', 'rb') as f:
+        # Submit without attack, should always return false even if ;admin=true; is in the plaintext
         plaintextP2 = f.read()
         ciphertext = submit(plaintextP2.decode('utf-8'))
         print(f'Verifying if admin=true: {verify(ciphertext)}\n')
 
+        # Flipping bit attack
         hacked_cipher_text = flipping_bit_attack(ciphertext)
         print(f'Verifying if admin=true after flipping bit: {verify(hacked_cipher_text)}\n')
